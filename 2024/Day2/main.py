@@ -17,7 +17,34 @@ def main():
     res = 0
     with open(filepath, "r") as input:
         for line in input.readlines():
-            print(line)
-    
+            report = [int(num) for num in line.split()]    # everything is seperated by whitespaces, so default split works fine, recreate it through list comprehension for int conversion
+            
+            if len(report) <= 1:    # for reports that have 1 entry or is empty, by default they are safe
+                res += 1
+                continue
+
+            curr_diff = report[0] - report[1]     # we will uses these diffs to check for increasing or decreasing
+
+            if not (1 <= abs(curr_diff) <= 3):     # mimics a do while loop from C, we perform the operation once, then throw it in the for loop, here if abs(curr_diff) is not within bounds, it fails
+                continue 
+            
+            for i in range(1, len(report) - 1):
+                prev_diff = curr_diff    # note, since ints are immutable, this is a copy, not a reference to curr_diff's value
+                curr_diff = report[i] - report[i + 1]
+                if not (1 <= abs(curr_diff) <= 3):
+                    res -= 1    # I did think about using a flag as it would be less janky, but effectively it reduces res by 1 here so when we add it back later it cancels out
+                    break
+                if curr_diff > 0 and prev_diff > 0:    # check if curr_diff and prev_diff are the same sign, if not it is not monotonically increasing/decreasing
+                    pass
+                elif curr_diff < 0 and prev_diff < 0:
+                    pass
+                else:
+                    res -= 1
+                    break
+
+            res += 1    # if no failures caught, add 1 to res
+
     print(res)
     return res
+
+main()
